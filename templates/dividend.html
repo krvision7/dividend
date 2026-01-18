@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dividend Optim | Premium</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        apple: {
+                            gray: '#1c1c1e',
+                            blue: '#2997ff',
+                            blue_dark: '#0071e3',
+                            green: '#30d158',
+                            orange: '#ff9f0a',
+                            red: '#ff453a',
+                            purple: '#bf5af2',
+                            indigo: '#5e5ce6',
+                        }
+                    },
+                    backdropBlur: {
+                        'xs': '2px',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f7;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hide Scrollbar but allow scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(28, 28, 30, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(44, 44, 46, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(58, 58, 60, 0.5);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #3a3a3c;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen pb-20 selection:bg-apple-blue selection:text-white">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 glass-panel border-b-0">
+        <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="/" class="text-white/60 hover:text-white transition"><i class="fas fa-chevron-left"></i>
+                    Home</a>
+                <div class="h-4 w-[1px] bg-white/20 mx-2"></div>
+                <h1 class="font-semibold text-lg tracking-tight">Dividend<span class="text-apple-blue">Optim</span></h1>
+            </div>
+            <div class="text-xs text-gray-500 font-medium tracking-wide">
+                DATA UPDATED: <span id="lastUpdated" class="text-gray-400">Loading...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-24 max-w-7xl mx-auto px-6">
+
+        <!-- Hero: Goal Setting -->
+        <section class="mb-16 text-center animate-fade-in">
+            <h2
+                class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                Design your cash flow.
+            </h2>
+            <p class="text-gray-400 mb-10 text-lg">Set your monthly target and choose a strategy.</p>
+
+            <div class="max-w-xl mx-auto glass-panel rounded-3xl p-1 inline-flex items-center gap-2">
+                <span class="pl-6 text-gray-400 font-medium">₩</span>
+                <input type="number" id="targetInput" value="1000000" step="100000"
+                    class="bg-transparent border-none text-3xl font-bold text-white w-48 focus:ring-0 text-center placeholder-gray-600"
+                    placeholder="1,000,000">
+                <span class="text-gray-500 pr-6 text-sm font-medium">/ month</span>
+            </div>
+
+            <!-- Quick Select Pills -->
+            <div class="flex justify-center gap-3 mt-6">
+                <button onclick="setGoal(500000)"
+                    class="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 text-sm transition">₩50만</button>
+                <button onclick="setGoal(1000000)"
+                    class="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 text-sm transition">₩100만</button>
+                <button onclick="setGoal(3000000)"
+                    class="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 text-sm transition">₩300만</button>
+                <button onclick="setGoal(5000000)"
+                    class="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 text-sm transition">₩500만</button>
+            </div>
+
+            <!-- Advanced Settings Toggle -->
+            <div class="mt-6">
+                <button onclick="document.getElementById('advSettings').classList.toggle('hidden')"
+                    class="text-xs text-gray-500 hover:text-white transition flex items-center justify-center gap-1 mx-auto">
+                    <i class="fas fa-sliders-h"></i> Advanced Settings
+                </button>
+                <div id="advSettings"
+                    class="hidden mt-4 glass-panel rounded-xl p-4 max-w-sm mx-auto flex gap-4 text-left">
+                    <div class="flex-1">
+                        <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">FX Rate
+                            (₩/$)</label>
+                        <input type="number" id="fxRate" value="1420"
+                            class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-1 text-sm text-white focus:border-apple-blue focus:outline-none">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">Tax Rate
+                            (%)</label>
+                        <input type="number" id="taxRate" value="15.4" step="0.1"
+                            class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-1 text-sm text-white focus:border-apple-blue focus:outline-none">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Theme Selector (Carousel) -->
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-4 px-2">
+                <h3 class="text-xl font-bold text-white">Choose a Strategy</h3>
+                <div class="flex gap-2">
+                    <button id="scrollLeft"
+                        class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400"><i
+                            class="fas fa-chevron-left"></i></button>
+                    <button id="scrollRight"
+                        class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400"><i
+                            class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div id="themeCarousel"
+                class="flex gap-4 overflow-x-auto no-scrollbar py-2 scroll-smooth snap-x snap-mandatory">
+                <!-- Themes will be injected here -->
+                <div class="animate-pulse flex gap-4 w-full">
+                    <div class="h-24 w-60 bg-white/5 rounded-2xl"></div>
+                    <div class="h-24 w-60 bg-white/5 rounded-2xl"></div>
+                    <div class="h-24 w-60 bg-white/5 rounded-2xl"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Result Grid -->
+        <section id="resultsSection" class="mb-20 animate-fade-in" style="animation-delay: 0.2s;">
+            <div id="loadingOverlay"
+                class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                <div class="text-center">
+                    <div
+                        class="inline-block w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mb-4">
+                    </div>
+                    <p class="text-sm font-medium text-gray-300">Optimizing Portfolio...</p>
+                </div>
+            </div>
+
+            <div id="tierGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Tier Cards will be injected here -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Detail Drawer (Slide-over) -->
+    <div id="detailDrawer"
+        class="fixed inset-y-0 right-0 w-full md:w-[480px] bg-[#1c1c1e] z-50 transform translate-x-full transition-transform duration-300 ease-in-out border-l border-white/10 shadow-2xl flex flex-col">
+        <!-- Close Button -->
+        <button onclick="closeDrawer()"
+            class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-gray-400 hover:bg-white/20 hover:text-white transition z-10">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <!-- Drawer Content -->
+        <div id="drawerContent" class="h-full overflow-y-auto p-8 relative">
+            <!-- Content injected by JS -->
+        </div>
+
+        <!-- Sticky Bottom Action -->
+        <div class="p-6 border-t border-white/10 bg-[#1c1c1e]/90 backdrop-blur pb-8">
+            <button
+                class="w-full py-4 bg-apple-blue hover:bg-apple-blue_dark text-white rounded-xl font-bold text-lg transition shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+                <i class="fas fa-plus"></i> Add to Basket
+            </button>
+        </div>
+    </div>
+
+    <!-- Basket Floating Button -->
+    <div class="fixed bottom-8 right-8 z-40">
+        <button onclick="openBasket()"
+            class="w-14 h-14 rounded-full bg-white text-black shadow-lg shadow-white/10 flex items-center justify-center hover:scale-105 transition-transform">
+            <i class="fas fa-shopping-bag text-xl"></i>
+            <span id="basketCount"
+                class="absolute -top-1 -right-1 bg-apple-red text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
+        </button>
+    </div>
+
+    <script>
+        // ============================================
+        // 상태 관리
+        // ============================================
+        let selectedTheme = 'dividend_growth'; // Default theme
+
+        // ============================================
+        // 초기화
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Setup Scroll Listeners
+            setupCarouselScroll();
+
+            // Initial Fetch
+            await fetchThemes();
+            triggerOptimization();
+        });
+
+        document.getElementById('targetInput').addEventListener('change', triggerOptimization);
+
+        // ============================================
+        // 캐러셀 스크롤 로직
+        // ============================================
+        function setupCarouselScroll() {
+            const carousel = document.getElementById('themeCarousel');
+            const leftBtn = document.getElementById('scrollLeft');
+            const rightBtn = document.getElementById('scrollRight');
+
+            if (leftBtn && carousel) {
+                leftBtn.addEventListener('click', () => {
+                    carousel.scrollBy({ left: -300, behavior: 'smooth' });
+                });
+            }
+            if (rightBtn && carousel) {
+                rightBtn.addEventListener('click', () => {
+                    carousel.scrollBy({ left: 300, behavior: 'smooth' });
+                });
+            }
+        }
+
+        // ============================================
+        // 테마 목록 로드
+        // ============================================
+        async function fetchThemes() {
+            try {
+                const res = await fetch('/api/dividend/themes');
+                let data = await res.json();
+
+                // Handle API Response Structure Mismatch fix
+                // API returns [ ...themes ] directly
+                let themes = [];
+                if (Array.isArray(data)) {
+                    themes = data;
+                } else if (data.themes) {
+                    themes = data.themes;
+                    // Update Meta if exists
+                    if (data.meta && data.meta.last_updated) {
+                        document.getElementById('lastUpdated').textContent = data.meta.last_updated;
+                    }
+                }
+
+                const container = document.getElementById('themeCarousel');
+                container.innerHTML = '';
+
+                themes.forEach((theme, idx) => {
+                    const isActive = theme.id === selectedTheme;
+                    const el = document.createElement('div');
+                    // Add snap-start class for better scrolling
+                    el.className = `flex-shrink-0 w-64 p-5 rounded-2xl cursor-pointer transition border snap-start ${isActive ? 'bg-white text-black border-white' : 'glass-card text-gray-300 border-white/5 hover:border-white/20'}`;
+                    el.onclick = () => selectTheme(theme.id);
+
+                    // Icon logic
+                    let icon = 'fa-chart-line';
+                    if (theme.id.includes('silver')) icon = 'fa-shield-alt';
+                    if (theme.id.includes('income')) icon = 'fa-coins';
+                    if (theme.id.includes('covered')) icon = 'fa-layer-group';
+                    if (theme.id.includes('reit')) icon = 'fa-building';
+                    if (theme.id.includes('quality')) icon = 'fa-gem';
+
+                    el.innerHTML = `
+                        <div class="flex items-start justify-between mb-3">
+                            <i class="fas ${icon} text-lg ${isActive ? 'text-apple-blue' : 'text-gray-500'}"></i>
+                            ${isActive ? '<i class="fas fa-check-circle text-apple-blue"></i>' : ''}
+                        </div>
+                        <h4 class="font-bold text-base mb-1 truncate">${theme.title}</h4>
+                        <p class="text-xs ${isActive ? 'text-gray-600' : 'text-gray-500'} leading-relaxed">${theme.subtitle}</p>
+                    `;
+                    container.appendChild(el);
+                });
+
+            } catch (e) {
+                console.error("Theme fetch failed", e);
+                // Show error state in carousel
+                const container = document.getElementById('themeCarousel');
+                container.innerHTML = `<div class="text-red-500 p-4">Failed to load themes. Check console.</div>`;
+            }
+        }
+
+        // ============================================
+        // 테마 선택
+        // ============================================
+        function selectTheme(id) {
+            selectedTheme = id;
+            fetchThemes(); // Re-render to update active state
+            triggerOptimization();
+        }
+
+        // ============================================
+        // 목표 금액 설정
+        // ============================================
+        function setGoal(amount) {
+            document.getElementById('targetInput').value = amount;
+            triggerOptimization();
+        }
+
+        // ============================================
+        // 포트폴리오 최적화 트리거
+        // ============================================
+        async function triggerOptimization() {
+            const themeId = selectedTheme;
+            const target = document.getElementById('targetInput').value || 1000000;
+            const fx = document.getElementById('fxRate').value;
+            const tax = document.getElementById('taxRate').value;
+
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+
+            try {
+                const res = await fetch('/api/dividend/all-tiers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        theme_id: themeId,
+                        target_monthly_krw: target,
+                        fx_rate: fx,
+                        tax_rate: tax
+                    })
+                });
+                const tiersData = await res.json();
+                renderTierCards(tiersData);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }
+        }
+
+        // ============================================
+        // 티어 카드 렌더링
+        // ============================================
+        function renderTierCards(tiers) {
+            const container = document.getElementById('tierGrid');
+            container.innerHTML = '';
+
+            const order = ['defensive', 'balanced', 'aggressive'];
+            const config = {
+                defensive: { color: 'emerald', label: 'Stable', icon: 'fa-shield-halved' },
+                balanced: { color: 'blue', label: 'Balanced', icon: 'fa-scale-balanced' },
+                aggressive: { color: 'orange', label: 'Aggressive', icon: 'fa-rocket' }
+            };
+
+            order.forEach(tierKey => {
+                const data = tiers[tierKey];
+                if (!data || data.error) return;
+
+                const style = config[tierKey];
+
+                // Badge class mapping
+                let badgeClass;
+                if (tierKey === 'defensive') badgeClass = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                if (tierKey === 'balanced') badgeClass = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
+                if (tierKey === 'aggressive') badgeClass = "bg-orange-500/10 text-orange-400 border border-orange-500/20";
+
+                const yieldVal = data.portfolio_yield || data.yield || 'N/A';
+                const monthlyFlow = data.expected_monthly_krw || 0;
+                const requiredCap = data.required_capital_krw || 0;
+
+                const card = document.createElement('div');
+                card.className = "glass-card rounded-3xl p-6 relative group overflow-hidden flex flex-col h-[480px]";
+                card.innerHTML = `
+                    <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition">
+                        <i class="fas ${style.icon} text-9xl text-white"></i>
+                    </div>
+
+                    <!-- Header -->
+                    <div class="flex items-center gap-3 mb-4 z-10">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${badgeClass}">
+                            ${tierKey}
+                        </span>
+                        <span class="text-[10px] text-gray-500 px-2 py-1 bg-white/5 rounded-full border border-white/5">
+                            Risk: ${data.risk_label}
+                        </span>
+                    </div>
+
+                    <!-- Main Info -->
+                    <div class="mb-8 z-10">
+                        <h3 class="text-2xl font-bold text-white mb-2">${data.title.split('(')[0]}</h3>
+                        <p class="text-sm text-gray-400 line-clamp-2 min-h-[40px]">${data.one_liner}</p>
+                    </div>
+
+                    <!-- Metrics -->
+                    <div class="space-y-6 z-10 flex-grow">
+                        <!-- Primary metric -->
+                        <div>
+                            <div class="text-[11px] text-gray-500 uppercase tracking-wide mb-1">Est. Monthly Income (Post-Tax)</div>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-3xl font-bold text-white tracking-tight">${Number(monthlyFlow).toLocaleString()}</span>
+                                <span class="text-sm text-gray-400 font-medium">KRW</span>
+                            </div>
+                            <!-- Progress vs Goal -->
+                            <div class="w-full bg-gray-800/50 h-1.5 rounded-full mt-3 overflow-hidden">
+                                <div class="bg-${style.color}-500 h-full rounded-full transition-all" style="width: ${Math.min(100, (monthlyFlow / data.target_monthly_krw) * 100)}%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Metrics Grid -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 rounded-xl bg-black/20 border border-white/5">
+                                <div class="text-[10px] text-gray-500 mb-1">Capital Required</div>
+                                <div class="font-semibold text-white text-sm whitespace-nowrap">${formatCompactNumber(requiredCap)}</div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-black/20 border border-white/5">
+                                <div class="text-[10px] text-gray-500 mb-1">Dividend Yield</div>
+                                <div class="font-semibold text-${style.color}-400 text-sm font-mono">${yieldVal}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action -->
+                    <div class="mt-auto pt-6 border-t border-white/5 z-10">
+                        <button onclick='openDetail(${JSON.stringify(data).replace(/'/g, "&#39;")})' class="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-semibold transition border border-white/10 flex items-center justify-center gap-2">
+                            View Analysis <i class="fas fa-arrow-right text-xs opacity-50"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ============================================
+        // 숫자 포맷팅
+        // ============================================
+        function formatCompactNumber(num) {
+            return new Intl.NumberFormat('ko-KR', { notation: "compact", maximumFractionDigits: 1 }).format(num) + '₩';
+        }
+
+        // ============================================
+        // Drawer 열기/닫기
+        // ============================================
+        function openDrawer() {
+            document.getElementById('detailDrawer').classList.remove('translate-x-full');
+        }
+
+        function closeDrawer() {
+            document.getElementById('detailDrawer').classList.add('translate-x-full');
+        }
+
+        // ============================================
+        // 상세 패널 열기
+        // ============================================
+        function openDetail(data) {
+            const content = document.getElementById('drawerContent');
+
+            // Build Allocation Table
+            let tableRows = data.allocation.map(item => `
+                <tr class="border-b border-white/5 text-sm">
+                    <td class="py-3 px-1">
+                        <div class="font-bold text-white">${item.ticker}</div>
+                        <div class="text-[10px] text-gray-500 truncate max-w-[120px]">${item.name}</div>
+                    </td>
+                    <td class="text-right text-gray-300">${item.weight}%</td>
+                    <td class="text-right text-white font-mono">${item.yield}</td>
+                </tr>
+            `).join('');
+
+            content.innerHTML = `
+                <div class="mb-8">
+                    <span class="text-xs font-bold px-2 py-1 rounded bg-white/10 text-white mb-2 inline-block">${data.title}</span>
+                    <h2 class="text-3xl font-bold text-white mb-2">Portfolio Detail</h2>
+                    <p class="text-gray-400 text-sm leading-relaxed">${data.description || data.one_liner}</p>
+                </div>
+
+                <!-- Chart -->
+                <div class="mb-8 p-4 rounded-2xl bg-black/40 border border-white/5">
+                    <h3 class="text-xs text-gray-500 uppercase tracking-widest mb-4">Projected Monthly Cashflow</h3>
+                    <div class="relative h-48 w-full">
+                        <canvas id="cashflowChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Holdings List -->
+                <div>
+                    <h3 class="text-xs text-gray-500 uppercase tracking-widest mb-4">Top Holdings (${data.allocation.length})</h3>
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[10px] text-gray-600 border-b border-white/10">
+                                <th class="pb-2 font-medium">Asset</th>
+                                <th class="pb-2 text-right font-medium">Weight</th>
+                                <th class="pb-2 text-right font-medium">Yield</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            openDrawer();
+
+            // Render Chart
+            setTimeout(() => {
+                const ctx = document.getElementById('cashflowChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [{
+                            label: 'Monthly Income (KRW)',
+                            data: data.chart_data,
+                            backgroundColor: '#2997ff',
+                            borderRadius: 4,
+                            barThickness: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { display: false },
+                            x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } }
+                        }
+                    }
+                });
+            }, 100);
+        }
+
+        // ============================================
+        // Basket 기능 (Placeholder)
+        // ============================================
+        function openBasket() {
+            alert('Basket feature coming soon!');
+        }
+
+        // ============================================
+        // 통화 포맷 헬퍼
+        // ============================================
+        function krw(val) { return Number(val).toLocaleString() + '₩'; }
+        function usd(val) { return '$' + Number(val).toLocaleString(); }
+    </script>
+
+</body>
+
+</html>

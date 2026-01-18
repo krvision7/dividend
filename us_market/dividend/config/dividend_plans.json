@@ -1,0 +1,655 @@
+{
+    "version": "1.0",
+    "tiers": [
+        {
+            "id": "defensive",
+            "label": "방어형",
+            "risk": "낮음"
+        },
+        {
+            "id": "balanced",
+            "label": "균형형",
+            "risk": "중간"
+        },
+        {
+            "id": "aggressive",
+            "label": "공격형",
+            "risk": "높음"
+        }
+    ],
+    "themes": [
+        {
+            "id": "max_monthly_income",
+            "title": "월배당 최고로 받자",
+            "subtitle": "현금흐름 최우선",
+            "tiers": {
+                "defensive": {
+                    "card_front": {
+                        "headline": "현금흐름 우선(방어)",
+                        "one_liner": "인컴은 챙기되, 흔들림은 낮추는 쪽",
+                        "risk_label": "중간 이하"
+                    },
+                    "constraints": {
+                        "etf_min": 0.6,
+                        "single_stock_max": 0.08,
+                        "max_tag_weight": {
+                            "high_yield": 0.45,
+                            "covered_call": 0.40
+                        }
+                    },
+                    "allowed_tags": [
+                        "covered_call",
+                        "dividend_quality",
+                        "monthly_payer",
+                        "core"
+                    ],
+                    "banned_tags": [
+                        "mreits"
+                    ]
+                },
+                "balanced": {
+                    "card_front": {
+                        "headline": "현금흐름 우선(균형)",
+                        "one_liner": "목표 달성 + 분산을 동시에",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.5,
+                        "single_stock_max": 0.10,
+                        "max_tag_weight": {
+                            "high_yield": 0.55,
+                            "covered_call": 0.55
+                        }
+                    },
+                    "allowed_tags": [
+                        "covered_call",
+                        "high_yield",
+                        "monthly_payer",
+                        "satellite"
+                    ],
+                    "banned_tags": []
+                },
+                "aggressive": {
+                    "card_front": {
+                        "headline": "현금흐름 극대화",
+                        "one_liner": "수익률 최우선. 감액/변동 가능성 큼",
+                        "risk_label": "높음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.35,
+                        "single_stock_max": 0.12,
+                        "max_tag_weight": {
+                            "high_yield": 0.75,
+                            "covered_call": 0.75
+                        }
+                    },
+                    "allowed_tags": [
+                        "high_yield",
+                        "covered_call",
+                        "reit",
+                        "bdc",
+                        "monthly_payer"
+                    ],
+                    "banned_tags": []
+                }
+            }
+        },
+        {
+            "id": "silver_pension",
+            "title": "실버 연금형 배당",
+            "subtitle": "월 생활비를 '고르게' 받는 것을 최우선",
+            "tiers": {
+                "defensive": {
+                    "card_front": {
+                        "headline": "연금형(방어)",
+                        "one_liner": "월별 입금 안정감을 최우선",
+                        "risk_label": "낮음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.75,
+                        "single_stock_max": 0.06
+                    },
+                    "allowed_tags": [
+                        "dividend_quality",
+                        "low_vol",
+                        "core",
+                        "monthly_payer"
+                    ],
+                    "banned_tags": [
+                        "mreits",
+                        "high_yield_bonds"
+                    ]
+                },
+                "balanced": {
+                    "card_front": {
+                        "headline": "연금형(균형)",
+                        "one_liner": "안정 + 목표 현금흐름",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.65,
+                        "single_stock_max": 0.08
+                    },
+                    "allowed_tags": [
+                        "dividend_quality",
+                        "covered_call",
+                        "core"
+                    ],
+                    "banned_tags": [
+                        "mreits"
+                    ]
+                },
+                "aggressive": {
+                    "card_front": {
+                        "headline": "연금형(공격)",
+                        "one_liner": "현금흐름을 높이되, 월별 편차는 관리",
+                        "risk_label": "중간~높음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.55,
+                        "single_stock_max": 0.10
+                    },
+                    "allowed_tags": [
+                        "covered_call",
+                        "high_yield",
+                        "monthly_payer",
+                        "reit",
+                        "bdc"
+                    ],
+                    "banned_tags": []
+                }
+            }
+        },
+        {
+            "id": "dividend_growth",
+            "title": "장기 성장배당",
+            "subtitle": "배당 '지금'보다 '앞으로'를 중시",
+            "tiers": {
+                "defensive": {
+                    "card_front": {
+                        "headline": "성장배당(방어)",
+                        "one_liner": "배당 성장 + 변동성 낮춤",
+                        "risk_label": "낮음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.70,
+                        "single_stock_max": 0.07
+                    },
+                    "allowed_tags": [
+                        "dividend_growth",
+                        "dividend_quality",
+                        "core",
+                        "low_vol"
+                    ],
+                    "banned_tags": [
+                        "covered_call",
+                        "mreits"
+                    ]
+                },
+                "balanced": {
+                    "card_front": {
+                        "headline": "성장배당(균형)",
+                        "one_liner": "배당 성장 + 적당한 인컴",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.60,
+                        "single_stock_max": 0.10
+                    },
+                    "allowed_tags": [
+                        "dividend_growth",
+                        "tech_div",
+                        "dividend_quality"
+                    ],
+                    "banned_tags": [
+                        "mreits"
+                    ]
+                },
+                "aggressive": {
+                    "card_front": {
+                        "headline": "성장배당(공격)",
+                        "one_liner": "성장 섹터 비중↑",
+                        "risk_label": "중간~높음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.45,
+                        "single_stock_max": 0.12
+                    },
+                    "allowed_tags": [
+                        "tech_div",
+                        "growth",
+                        "dividend_growth"
+                    ],
+                    "banned_tags": []
+                }
+            }
+        },
+        {
+            "id": "schd_core_quality",
+            "title": "퀄리티 배당 코어",
+            "subtitle": "분산/퀄리티/일관성",
+            "tiers": {
+                "defensive": {
+                    "card_front": {
+                        "headline": "퀄리티 코어(방어)",
+                        "one_liner": "핵심 퀄리티 ETF 중심",
+                        "risk_label": "낮음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.80,
+                        "single_stock_max": 0.05
+                    },
+                    "allowed_tags": [
+                        "dividend_quality",
+                        "core",
+                        "low_vol"
+                    ],
+                    "banned_tags": [
+                        "high_yield",
+                        "mreits",
+                        "covered_call"
+                    ]
+                },
+                "balanced": {
+                    "card_front": {
+                        "headline": "퀄리티 코어(균형)",
+                        "one_liner": "퀄리티 + 적당한 수익률",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.70,
+                        "single_stock_max": 0.08
+                    },
+                    "allowed_tags": [
+                        "dividend_quality",
+                        "core",
+                        "dividend_growth"
+                    ],
+                    "banned_tags": [
+                        "mreits"
+                    ]
+                },
+                "aggressive": {
+                    "card_front": {
+                        "headline": "퀄리티 코어(공격)",
+                        "one_liner": "퀄리티 + 개별주 확대",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.55,
+                        "single_stock_max": 0.10
+                    },
+                    "allowed_tags": [
+                        "dividend_quality",
+                        "dividend_growth",
+                        "tech_div"
+                    ],
+                    "banned_tags": []
+                }
+            }
+        },
+        {
+            "id": "covered_call_premium",
+            "title": "커버드콜 프리미엄",
+            "subtitle": "옵션 프리미엄 인컴",
+            "tiers": {
+                "defensive": {
+                    "card_front": {
+                        "headline": "커버드콜(방어)",
+                        "one_liner": "옵션 프리미엄 + 안정성",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.70,
+                        "single_stock_max": 0.06
+                    },
+                    "allowed_tags": [
+                        "covered_call",
+                        "dividend_quality",
+                        "monthly_payer"
+                    ],
+                    "banned_tags": [
+                        "mreits",
+                        "high_yield_bonds"
+                    ]
+                },
+                "balanced": {
+                    "card_front": {
+                        "headline": "커버드콜(균형)",
+                        "one_liner": "프리미엄 수익 + 분산",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.60,
+                        "single_stock_max": 0.08
+                    },
+                    "allowed_tags": [
+                        "covered_call",
+                        "high_yield",
+                        "monthly_payer"
+                    ],
+                    "banned_tags": []
+                },
+                "aggressive": {
+                    "card_front": {
+                        "headline": "커버드콜(공격)",
+                        "one_liner": "프리미엄 극대화",
+                        "risk_label": "중간~높음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.45,
+                        "single_stock_max": 0.12
+                    },
+                    "allowed_tags": [
+                        "covered_call",
+                        "high_yield",
+                        "reit",
+                        "monthly_payer"
+                    ],
+                    "banned_tags": []
+                }
+            }
+        },
+        {
+            "id": "reit_real_assets",
+            "title": "리츠·실물자산",
+            "subtitle": "부동산/인프라 인컴",
+            "tiers": {
+                "defensive": {
+                    "card_front": {
+                        "headline": "리츠(방어)",
+                        "one_liner": "우량 리츠 ETF 중심",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.70,
+                        "single_stock_max": 0.08
+                    },
+                    "allowed_tags": [
+                        "reit",
+                        "real_assets",
+                        "dividend_quality"
+                    ],
+                    "banned_tags": [
+                        "mreits"
+                    ]
+                },
+                "balanced": {
+                    "card_front": {
+                        "headline": "리츠(균형)",
+                        "one_liner": "리츠 분산 + 수익률",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.55,
+                        "single_stock_max": 0.10
+                    },
+                    "allowed_tags": [
+                        "reit",
+                        "real_assets",
+                        "monthly_payer"
+                    ],
+                    "banned_tags": []
+                },
+                "aggressive": {
+                    "card_front": {
+                        "headline": "리츠(공격)",
+                        "one_liner": "개별 리츠 비중 확대",
+                        "risk_label": "중간~높음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.40,
+                        "single_stock_max": 0.12
+                    },
+                    "allowed_tags": [
+                        "reit",
+                        "real_assets",
+                        "high_yield",
+                        "mreits"
+                    ],
+                    "banned_tags": []
+                }
+            }
+        },
+        {
+            "id": "bdc_credit_income",
+            "title": "BDC·크레딧 인컴",
+            "subtitle": "중소기업 대출 인컴",
+            "tiers": {
+                "defensive": {
+                    "card_front": {
+                        "headline": "BDC(방어)",
+                        "one_liner": "우량 BDC 중심",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.60,
+                        "single_stock_max": 0.08
+                    },
+                    "allowed_tags": [
+                        "bdc",
+                        "dividend_quality",
+                        "high_yield"
+                    ],
+                    "banned_tags": []
+                },
+                "balanced": {
+                    "card_front": {
+                        "headline": "BDC(균형)",
+                        "one_liner": "BDC 분산 + 수익률",
+                        "risk_label": "중간~높음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.50,
+                        "single_stock_max": 0.10
+                    },
+                    "allowed_tags": [
+                        "bdc",
+                        "high_yield",
+                        "monthly_payer"
+                    ],
+                    "banned_tags": []
+                },
+                "aggressive": {
+                    "card_front": {
+                        "headline": "BDC(공격)",
+                        "one_liner": "BDC 수익률 극대화",
+                        "risk_label": "높음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.35,
+                        "single_stock_max": 0.12
+                    },
+                    "allowed_tags": [
+                        "bdc",
+                        "high_yield",
+                        "preferreds"
+                    ],
+                    "banned_tags": []
+                }
+            }
+        },
+        {
+            "id": "utilities_low_vol_income",
+            "title": "저변동 인컴",
+            "subtitle": "유틸리티/디펜시브",
+            "tiers": {
+                "defensive": {
+                    "card_front": {
+                        "headline": "저변동(방어)",
+                        "one_liner": "유틸리티 중심 안정 인컴",
+                        "risk_label": "낮음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.75,
+                        "single_stock_max": 0.06
+                    },
+                    "allowed_tags": [
+                        "utilities",
+                        "low_vol",
+                        "staples",
+                        "dividend_quality"
+                    ],
+                    "banned_tags": [
+                        "high_yield",
+                        "mreits"
+                    ]
+                },
+                "balanced": {
+                    "card_front": {
+                        "headline": "저변동(균형)",
+                        "one_liner": "저변동 + 적당한 수익률",
+                        "risk_label": "낮음~중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.65,
+                        "single_stock_max": 0.08
+                    },
+                    "allowed_tags": [
+                        "utilities",
+                        "low_vol",
+                        "healthcare",
+                        "dividend_quality"
+                    ],
+                    "banned_tags": []
+                },
+                "aggressive": {
+                    "card_front": {
+                        "headline": "저변동(공격)",
+                        "one_liner": "저변동 + 개별주 확대",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.50,
+                        "single_stock_max": 0.10
+                    },
+                    "allowed_tags": [
+                        "utilities",
+                        "staples",
+                        "healthcare",
+                        "dividend_growth"
+                    ],
+                    "banned_tags": []
+                }
+            }
+        },
+        {
+            "id": "inflation_energy_income",
+            "title": "인플레이션·에너지",
+            "subtitle": "인플레 헤지 인컴",
+            "tiers": {
+                "defensive": {
+                    "card_front": {
+                        "headline": "인플레 헤지(방어)",
+                        "one_liner": "인플레 헤지 ETF 중심",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.70,
+                        "single_stock_max": 0.08
+                    },
+                    "allowed_tags": [
+                        "inflation_hedge",
+                        "energy",
+                        "midstream",
+                        "real_assets"
+                    ],
+                    "banned_tags": []
+                },
+                "balanced": {
+                    "card_front": {
+                        "headline": "인플레 헤지(균형)",
+                        "one_liner": "에너지 + 인프라 분산",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.55,
+                        "single_stock_max": 0.10
+                    },
+                    "allowed_tags": [
+                        "energy",
+                        "midstream",
+                        "inflation_hedge",
+                        "high_yield"
+                    ],
+                    "banned_tags": []
+                },
+                "aggressive": {
+                    "card_front": {
+                        "headline": "인플레 헤지(공격)",
+                        "one_liner": "에너지 섹터 집중",
+                        "risk_label": "높음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.40,
+                        "single_stock_max": 0.12
+                    },
+                    "allowed_tags": [
+                        "energy",
+                        "midstream",
+                        "high_yield"
+                    ],
+                    "banned_tags": []
+                }
+            }
+        },
+        {
+            "id": "intl_diversifier",
+            "title": "글로벌 배당 분산",
+            "subtitle": "해외 배당 노출",
+            "tiers": {
+                "defensive": {
+                    "card_front": {
+                        "headline": "글로벌(방어)",
+                        "one_liner": "해외 배당 ETF 중심",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.75,
+                        "single_stock_max": 0.06
+                    },
+                    "allowed_tags": [
+                        "international_div",
+                        "dividend_quality",
+                        "core"
+                    ],
+                    "banned_tags": []
+                },
+                "balanced": {
+                    "card_front": {
+                        "headline": "글로벌(균형)",
+                        "one_liner": "해외 + 미국 분산",
+                        "risk_label": "중간"
+                    },
+                    "constraints": {
+                        "etf_min": 0.65,
+                        "single_stock_max": 0.08
+                    },
+                    "allowed_tags": [
+                        "international_div",
+                        "high_yield",
+                        "dividend_quality"
+                    ],
+                    "banned_tags": []
+                },
+                "aggressive": {
+                    "card_front": {
+                        "headline": "글로벌(공격)",
+                        "one_liner": "해외 고배당 집중",
+                        "risk_label": "중간~높음"
+                    },
+                    "constraints": {
+                        "etf_min": 0.50,
+                        "single_stock_max": 0.10
+                    },
+                    "allowed_tags": [
+                        "international_div",
+                        "high_yield",
+                        "emerging"
+                    ],
+                    "banned_tags": []
+                }
+            }
+        }
+    ]
+}
